@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { text, language } = req.body;
+  const { text } = req.body;
 
   if (!text) {
     return res.status(400).json({ error: 'Text is required' });
@@ -18,8 +18,8 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           input: { text: text },
           voice: {
-            languageCode: language || 'en-US',
-            name: language === 'ur-PK' ? 'ur-PK-Standard-A' : 'en-US-Neural2-F',
+            languageCode: 'en-US',
+            name: 'en-US-Neural2-F',
             ssmlGender: 'FEMALE'
           },
           audioConfig: {
@@ -30,6 +30,9 @@ export default async function handler(req, res) {
     );
 
     const data = await response.json();
+    
+    // Log for debugging
+    console.log('TTS Response:', JSON.stringify(data));
 
     if (data.error) {
       return res.status(500).json({ error: data.error.message });
@@ -38,6 +41,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ audioContent: data.audioContent });
 
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to generate speech' });
+    console.log('Error:', error.message);
+    return res.status(500).json({ error: error.message });
   }
 }

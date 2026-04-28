@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NovaTTS - Free Text to Speech</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0a0f;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    /* NAVBAR */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 40px;
+      background: #0f0f1a;
+      border-bottom: 1px solid #1e1e3a;
+    }
+    .logo { 
+      font-size: 1.4rem; 
+      font-weight: 700; 
+      color: #a78bfa; 
+    }
+    .nav-btns { display: flex; gap: 12px; }
+    .btn-login {
+      padding: 8px 20px;
+      border: 1px solid #a78bfa;
+      background: transparent;
+      color: #a78bfa;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-signup {
+      padding: 8px 20px;
+      background: #a78bfa;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 60px 20px 40px;
+    }
+    .hero h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a78bfa, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      color: #888;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+    .badge {
+      display: inline-block;
+      background: #1a1a2e;
+      border: 1px solid #a78bfa33;
+      color: #a78bfa;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+
+    /* MAIN TOOL */
+    .tool-container {
+      max-width: 750px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .tool-box {
+      background: #0f0f1a;
+      border: 1px solid #1e1e3a;
+      border-radius: 20px;
+      padding: 30px;
+    }
+
+    /* Voice Selection */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .select-label {
+      color: #888;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+    select {
+      width: 100%;
+      padding: 12px;
+      background: #0a0a0f;
+      border: 1px solid #1e1e3a;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      cursor: pointer;
+    }
+    select:focus { border-color: #a78bfa; }
+
+    /* Textarea */
+    .textarea-wrap { position: relative; margin-bottom: 8px; }
+    textarea {
+      width: 100%;
+      height: 180px;
+      background: #0a0a0f;
+      border: 1px solid #1e1e3a;
+      border-radius: 12px;
+      padding: 16px;
+      color: #fff;
+      font-size: 1rem;
+      resize: none;
+      outline: none;
+      line-height: 1.6;
+      transition: border 0.3s;
+    }
+    textarea:focus { border-color: #a78bfa; }
+    textarea::placeholder { color: #444; }
+
+    .char-info {
+      display: flex;
+      justify-content: space-between;
+      color: #555;
+      font-size: 0.82rem;
+      margin-bottom: 20px;
+    }
+    .char-info span { color: #a78bfa; }
+
+    /* Generate Button */
+    .btn-generate {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      letter-spacing: 0.5px;
+    }
+    .btn-generate:hover { opacity: 0.9; }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Audio Player */
+    .audio-section {
+      margin-top: 20px;
+      display: none;
+    }
+    .audio-section.show { display: block; }
+    .audio-box {
+      background: #0a0a0f;
+      border: 1px solid #1e1e3a;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .audio-title {
+      color: #888;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+    audio {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    .btn-download {
+      width: 100%;
+      padding: 12px;
+      background: #1a1a2e;
+      border: 1px solid #a78bfa;
+      color: #a78bfa;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    .btn-download:hover { background: #a78bfa22; }
+
+    /* Status */
+    .status {
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.loading { background: #1a1a2e; color: #a78bfa; }
+    .status.error { background: #2a0a0a; color: #f87171; }
+
+    /* Daily Limit Bar */
+    .limit-bar {
+      margin-top: 20px;
+      padding: 15px;
+      background: #0a0a0f;
+      border: 1px solid #1e1e3a;
+      border-radius: 12px;
+    }
+    .limit-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .limit-top span { color: #a78bfa; }
+    .progress {
+      height: 6px;
+      background: #1e1e3a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #a78bfa, #60a5fa);
+      border-radius: 10px;
+      transition: width 0.5s;
+    }
+
+    /* Features */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      max-width: 750px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .feature-card {
+      background: #0f0f1a;
+      border: 1px solid #1e1e3a;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+    .feature-icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .feature-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 5px; }
+    .feature-desc { font-size: 0.8rem; color: #666; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">🎙️ NovaTTS</div>
+    <div class="nav-btns" id="navBtns">
+      <button class="btn-login" onclick="window.location.href='login.html'">Login</button>
+      <button class="btn-signup" onclick="window.location.href='signup.html'">Sign Up Free</button>
+    </div>
+    <div id="navUser" style="display:none; align-items:center; gap:12px;">
+      <span style="color:#a78bfa; font-weight:600;" id="userName">👤 User</span>
+      <button class="btn-login" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="badge">✨ Powered by Google AI</div>
+    <h1>Text to Speech,<br>Reimagined</h1>
+    <p>Convert any text to natural-sounding voice. Free. No credit card.</p>
+  </div>
+
+  <!-- TOOL -->
+  <div class="tool-container">
+    <div class="tool-box">
+
+      <!-- Voice Options -->
+      <div class="voice-grid">
+        <div>
+          <div class="select-label">🌍 Language</div>
+          <select id="langSelect">
+            <option value="en-US">English (US)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="ur-PK">Urdu</option>
+            <option value="hi-IN">Hindi</option>
+            <option value="ar-SA">Arabic</option>
+          </select>
+        </div>
+        <div>
+          <div class="select-label">🎭 Voice Style</div>
+          <select id="styleSelect">
+            <option value="natural">Natural</option>
+            <option value="professional">Professional</option>
+            <option value="friendly">Friendly</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Textarea -->
+      <div class="textarea-wrap">
+        <textarea 
+          id="textInput" 
+          placeholder="Type or paste your text here..."
+          maxlength="1000"
+          oninput="updateCount()"></textarea>
+      </div>
+      <div class="char-info">
+        <span>Free: 1000 characters per generation</span>
+        <span><span id="charCount">0</span>/1000</span>
+      </div>
+
+      <!-- Button -->
+      <button class="btn-generate" id="generateBtn" onclick="generateSpeech()">
+        🔊 Generate Speech
+      </button>
+
+      <!-- Status -->
+      <div class="status" id="status"></div>
+
+      <!-- Audio Output -->
+      <div class="audio-section" id="audioSection">
+        <div class="audio-box">
+          <div class="audio-title">🎵 Your Generated Audio</div>
+          <audio id="audioPlayer" controls></audio>
+          <button class="btn-download" onclick="downloadAudio()">
+            ⬇️ Download Audio (MP3)
+          </button>
+        </div>
+      </div>
+
+      <!-- Daily Limit -->
+      <div class="limit-bar">
+        <div class="limit-top">
+          <span>Daily Generations Used</span>
+          <span id="limitText">0 / 3 used</span>
+        </div>
+        <div class="progress">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">Google AI Powered</div>
+      <div class="feature-desc">Natural sounding voices using latest AI models</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⬇️</div>
+      <div class="feature-title">Download Audio</div>
+      <div class="feature-desc">Save your audio files for 7 days</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-title">Secure & Private</div>
+      <div class="feature-desc">Your text is never stored permanently</div>
+    </div>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    let usedToday = 0;
+    const maxFree = 3;
+    let audioBlob = null;
+
+    function updateCount() {
+      const len = document.getElementById('textInput').value.length;
+      document.getElementById('charCount').textContent = len;
+    }
+
+    function showStatus(msg, type) {
+      const s = document.getElementById('status');
+      s.textContent = msg;
+      s.className = `status show ${type}`;
+    }
+
+    function updateLimit() {
+      document.getElementById('limitText').textContent = `${usedToday} / ${maxFree} used`;
+      const pct = (usedToday / maxFree) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+    }
+
+    async function generateSpeech() {
+      const text = document.getElementById('textInput').value.trim();
+      
+      if (!text) { showStatus('⚠️ Please enter some text!', 'error'); return; }
+      if (usedToday >= maxFree) { 
+        showStatus('❌ Daily limit reached! Sign up for more generations.', 'error'); 
+        return; 
+      }
+
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      showStatus('🔄 Generating your audio...', 'loading');
+      document.getElementById('audioSection').classList.remove('show');
+
+      // Using Web Speech API for now (Google AI backend coming soon)
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = document.getElementById('langSelect').value;
+        
+        utterance.onend = () => {
+          usedToday++;
+          updateLimit();
+          btn.disabled = false;
+          document.getElementById('status').className = 'status';
+          document.getElementById('audioSection').classList.add('show');
+        };
+
+        window.speechSynthesis.speak(utterance);
+
+      } catch(e) {
+        showStatus('❌ Error generating speech. Try again.', 'error');
+        btn.disabled = false;
+      }
+    }
+
+    function downloadAudio() {
+      showStatus('⚠️ Download available after login. Sign up free!', 'error');
+    }
+
+    updateLimit();
+    const { createClient } = supabase;
+const sbClient = createClient(
+  'https://xscnufncpnbekwhscfzr.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzY251Zm5jcG5iZWt3aHNjZnpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNzI3NDYsImV4cCI6MjA5Mjg0ODc0Nn0.BbVkdRsKK8o9pvroW-RJAxVg_o45SFxPl1PxqD3HL9U'
+);
+
+async function checkUser() {
+  const { data: { user } } = await sbClient.auth.getUser();
+  if (user) {
+    document.getElementById('navBtns').style.display = 'none';
+    document.getElementById('navUser').style.display = 'flex';
+    const name = user.user_metadata?.full_name || user.email;
+    document.getElementById('userName').textContent = '👤 ' + name;
+  }
+}
+
+async function logout() {
+  await sbClient.auth.signOut();
+  window.location.reload();
+}
+
+checkUser();
+  </script>
+
+</body>
+</html>
